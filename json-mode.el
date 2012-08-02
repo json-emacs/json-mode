@@ -8,7 +8,7 @@
 
 (defconst json-quoted-key-re "\\(\"[^\"]+?\"[ ]*:\\)")
 (defconst json-quoted-string-re "\\(\".*?\"\\)") 
-(defconst json-int-re "\\([^\"][0-9]+[^\"]\\)")
+(defconst json-number-re "[^\"]\\([0-9]+\\(\\.[0-9]+\\)?\\)[^\"]")
 (defconst json-keyword-re "\\(true\\|false\\|null\\)")
 
 (defconst json-font-lock-keywords-1
@@ -16,7 +16,7 @@
    (list json-quoted-key-re 1 font-lock-keyword-face)
    (list json-quoted-string-re 1 font-lock-string-face)
    (list json-keyword-re 1 font-lock-constant-face)
-   (list json-int-re 1 font-lock-constant-face)
+   (list json-number-re 1 font-lock-constant-face)
    )
   "Level one font lock.")
 
