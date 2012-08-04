@@ -1,5 +1,6 @@
 ;;; json-mode.el --- major mode for editing JSON files
 ;;; - extends javascript mode to add better syntax highlighting
+;;; https://github.com/joshwnj/json-mode
 
 ;;;;
 ;; syntax highlighting
