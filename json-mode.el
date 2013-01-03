@@ -1,7 +1,7 @@
 ;;; json-mode.el --- Major mode for editing JSON files
 ;;; Author: Josh Johnston
 ;;; URL: https://github.com/joshwnj/json-mode
-;;; Version: 0.1.1
+;;; Version: 0.1.2
 
 ;;;;
 ;; extend javascript-mode's syntax highlighting
@@ -26,8 +26,10 @@
   (interactive)
   (let ((b (if mark-active (min (point) (mark)) (point-min)))
         (e (if mark-active (max (point) (mark)) (point-max))))
+    ;; Beautify json with support for non-ascii characters.
+    ;; Thanks to https://github.com/jarl-dk for this improvement.
     (shell-command-on-region b e
-     "python -mjson.tool" (current-buffer) t)))
+     "python -c 'import sys,json; data=json.loads(sys.stdin.read()); print json.dumps(data,sort_keys=True,indent=4).decode(\"unicode_escape\").encode(\"utf8\",\"replace\")'" (current-buffer) t)))
 
 ;;;###autoload
 (define-derived-mode json-mode javascript-mode "JSON"
