@@ -1,9 +1,8 @@
 ;;; json-mode.el --- major mode for editing JSON files
-;;; - extends javascript mode to add better syntax highlighting
-;;; https://github.com/joshwnj/json-mode
+;;; URL: https://github.com/joshwnj/json-mode
 
 ;;;;
-;; syntax highlighting
+;; extend javascript-mode's syntax highlighting
 
 (defvar json-mode-hook nil)
 
@@ -35,3 +34,4 @@
 (define-key json-mode-map (kbd "C-c C-f") 'beautify-json)
 
 (provide 'json-mode)
+;;; json-mode.el ends here
