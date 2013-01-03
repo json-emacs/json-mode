@@ -1,5 +1,7 @@
-;;; json-mode.el --- major mode for editing JSON files
+;;; json-mode.el --- Major mode for editing JSON files
+;;; Author: Josh Johnston
 ;;; URL: https://github.com/joshwnj/json-mode
+;;; Version: 0.1.1
 
 ;;;;
 ;; extend javascript-mode's syntax highlighting
@@ -27,9 +29,12 @@
     (shell-command-on-region b e
      "python -mjson.tool" (current-buffer) t)))
 
+;;;###autoload
 (define-derived-mode json-mode javascript-mode "JSON"
   "Major mode for editing JSON files"
   (set (make-local-variable 'font-lock-defaults) '(json-font-lock-keywords-1 t)))
+
+(add-to-list 'auto-mode-alist '("\\.json$" . json-mode))
 
 (define-key json-mode-map (kbd "C-c C-f") 'beautify-json)
 
