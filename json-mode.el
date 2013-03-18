@@ -29,7 +29,10 @@
     ;; Beautify json with support for non-ascii characters.
     ;; Thanks to https://github.com/jarl-dk for this improvement.
     (shell-command-on-region b e
-     "python -c 'import sys,json; data=json.loads(sys.stdin.read()); print json.dumps(data,sort_keys=True,indent=4).decode(\"unicode_escape\").encode(\"utf8\",\"replace\")'" (current-buffer) t)))
+	(concat (if (executable-find "env") "env " "")
+		(concat (if (executable-find "python2") "python2" "python")
+			" -c 'import sys,json; data=json.loads(sys.stdin.read()); print json.dumps(data,sort_keys=True,indent=4).decode(\"unicode_escape\").encode(\"utf8\",\"replace\")'"))
+	(current-buffer) t)))
 
 ;;;###autoload
 (define-derived-mode json-mode javascript-mode "JSON"
