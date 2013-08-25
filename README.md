@@ -1,9 +1,9 @@
 json-mode.el
 ====
 
-Major mode for editing JSON files
+Major mode for editing JSON files.
 
-Extends javascript mode to add better syntax highlighting
+Extends the builtin js-mode to add better syntax highlighting for JSON.
 
 Install
 ----

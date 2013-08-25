@@ -1,10 +1,10 @@
 ;;; json-mode.el --- Major mode for editing JSON files
 ;;; Author: Josh Johnston
 ;;; URL: https://github.com/joshwnj/json-mode
-;;; Version: 1.0.0
+;;; Version: 1.0.1
 
 ;;;;
-;; extend javascript-mode's syntax highlighting
+;; extend the builtin js-mode's syntax highlighting
 
 (defvar json-mode-hook nil)
 
