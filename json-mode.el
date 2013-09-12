@@ -39,6 +39,7 @@
   "Major mode for editing JSON files"
   (set (make-local-variable 'font-lock-defaults) '(json-font-lock-keywords-1 t)))
 
+;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.json$" . json-mode))
 
 (define-key json-mode-map (kbd "C-c C-f") 'beautify-json)
