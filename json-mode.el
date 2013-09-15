@@ -22,8 +22,8 @@
    )
   "Level one font lock.")
 
-(defconst python2-beautify-json "python2 -c 'import sys,json; data=json.loads(sys.stdin.read()); print json.dumps(data,sort_keys=True,indent=4,separators=(\",\", \": \")).decode(\"unicode_escape\").encode(\"utf8\",\"replace\")'")
-(defconst python3-beautify-json "python3 -c 'import sys,json,codecs; data=json.loads(sys.stdin.read()); print((codecs.getdecoder(\"unicode_escape\")(json.dumps(data,sort_keys=True,indent=4,separators=(\",\", \": \"))))[0])'")
+(defconst python2-beautify-json "python2 -c \"import sys,json; data=json.loads(sys.stdin.read()); print json.dumps(data,sort_keys=True,indent=4,separators=(',',': ')).decode('unicode_escape').encode('utf8','replace')\"")
+(defconst python3-beautify-json "python3 -c \"import sys,json,codecs; data=json.loads(sys.stdin.read()); print((codecs.getdecoder('unicode_escape')(json.dumps(data,sort_keys=True,indent=4,separators=(',',': '))))[0])\"")
 
 (defun beautify-json ()
   (interactive)
