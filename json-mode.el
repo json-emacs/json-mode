@@ -22,6 +22,9 @@
    )
   "Level one font lock.")
 
+(defconst python2-beautify-json "python2 -c 'import sys,json; data=json.loads(sys.stdin.read()); print json.dumps(data,sort_keys=True,indent=4,separators=(\",\", \": \")).decode(\"unicode_escape\").encode(\"utf8\",\"replace\")'")
+(defconst python3-beautify-json "python3 -c 'import sys,json,codecs; data=json.loads(sys.stdin.read()); print((codecs.getdecoder(\"unicode_escape\")(json.dumps(data,sort_keys=True,indent=4,separators=(\",\", \": \"))))[0])'")
+
 (defun beautify-json ()
   (interactive)
   (let ((b (if mark-active (min (point) (mark)) (point-min)))
@@ -30,8 +33,7 @@
     ;; Thanks to https://github.com/jarl-dk for this improvement.
     (shell-command-on-region b e
                              (concat (if (executable-find "env") "env " "")
-                                     (concat (if (executable-find "python2") "python2" "python")
-                                             " -c 'import sys,json; data=json.loads(sys.stdin.read()); print json.dumps(data,sort_keys=True,indent=4,separators=(\",\", \": \")).decode(\"unicode_escape\").encode(\"utf8\",\"replace\")'"))
+                                     (if (executable-find "python2") python2-beautify-json python3-beautify-json))
                              (current-buffer) t)))
 
 ;;;###autoload
