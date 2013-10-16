@@ -25,42 +25,61 @@
 
 ;;; Code:
 
-(defvar json-mode-hook nil)
+(require 'js)
+(require 'rx)
 
-(defconst json-quoted-key-re "\\(\"[^\"]+?\"[ ]*:\\)")
-(defconst json-quoted-string-re "\\(\".*?\"\\)")
-(defconst json-number-re "[^\"]\\([0-9]+\\(\\.[0-9]+\\)?\\)[^\"]")
-(defconst json-keyword-re "\\(true\\|false\\|null\\)")
+(defconst json-mode-quoted-string-re
+  (rx (group (char ?\")
+             (zero-or-more (or (seq ?\\ ?\\)
+                               (seq ?\\ ?\")
+                               (seq ?\\ (not (any ?\" ?\\)))
+                               (not (any ?\" ?\\))))
+             (char ?\"))))
+(defconst json-mode-quoted-key-re
+  (rx (group (char ?\")
+             (zero-or-more (or (seq ?\\ ?\\)
+                               (seq ?\\ ?\")
+                               (seq ?\\ (not (any ?\" ?\\)))
+                               (not (any ?\" ?\\))))
+             (char ?\"))
+      (zero-or-more blank)
+      ?\:))
+(defconst json-mode-number-re (rx (group (one-or-more digit)
+                                         (optional ?\. (one-or-more digit)))))
+(defconst json-mode-keyword-re  (rx (group (or "true" "false" "null"))))
 
 (defconst json-font-lock-keywords-1
   (list
-   (list json-quoted-key-re 1 font-lock-keyword-face)
-   (list json-quoted-string-re 1 font-lock-string-face)
-   (list json-keyword-re 1 font-lock-constant-face)
-   (list json-number-re 1 font-lock-constant-face)
+   (list json-mode-quoted-key-re 1 font-lock-keyword-face)
+   (list json-mode-quoted-string-re 1 font-lock-string-face)
+   (list json-mode-keyword-re 1 font-lock-constant-face)
+   (list json-mode-number-re 1 font-lock-constant-face)
    )
   "Level one font lock.")
 
-(defconst python2-beautify-json "python2 -c \"import sys,json,collections; data=json.loads(sys.stdin.read(),object_pairs_hook=collections.OrderedDict); print json.dumps(data,sort_keys=%s,indent=4,separators=(',',': ')).decode('unicode_escape').encode('utf8','replace')\"")
-(defconst python3-beautify-json "python3 -c \"import sys,json,codecs,collections; data=json.loads(sys.stdin.read(),object_pairs_hook=collections.OrderedDict); print((codecs.getdecoder('unicode_escape')(json.dumps(data,sort_keys=%s,indent=4,separators=(',',': '))))[0])\"")
+(defconst json-mode-beautify-command-python2
+  "python2 -c \"import sys,json,collections; data=json.loads(sys.stdin.read(),object_pairs_hook=collections.OrderedDict); print json.dumps(data,sort_keys=%s,indent=4,separators=(',',': ')).decode('unicode_escape').encode('utf8','replace')\"")
+(defconst json-mode-beautify-command-python3
+  "python3 -c \"import sys,json,codecs,collections; data=json.loads(sys.stdin.read(),object_pairs_hook=collections.OrderedDict); print((codecs.getdecoder('unicode_escape')(json.dumps(data,sort_keys=%s,indent=4,separators=(',',': '))))[0])\"")
 
-(defun beautify-json_ (sort-keys)
-  (let ((b (if mark-active (min (point) (mark)) (point-min)))
-        (e (if mark-active (max (point) (mark)) (point-max))))
-    ;; Beautify json with support for non-ascii characters.
-    ;; Thanks to https://github.com/jarl-dk for this improvement.
-    (shell-command-on-region b e
-                             (concat (if (executable-find "env") "env " "")
-                                     (format (if (executable-find "python2") python2-beautify-json python3-beautify-json) sort-keys))
-                             (current-buffer) t)))
+;;;###autoload
+(defun json-mode-beautify (beg end &optional preserve-key-order)
+  "Beautify / pretty-print from BEG to END, and optionally PRESERVE-KEY-ORDER."
+  (interactive "r\nP")
+  (shell-command-on-region (if mark-active beg (point-min))
+                           (if mark-active end (point-max))
+                           (concat (if (executable-find "env") "env " "")
+                                   (format (if (executable-find "python2")
+                                               json-mode-beautify-command-python2
+                                             json-mode-beautify-command-python3)
+                                           (if preserve-key-order "False" "True")))
+                           (current-buffer) t))
 
-(defun beautify-json ()
-  (interactive)
-  (beautify-json_ "True"))
-
-(defun ordered-beautify-json ()
-  (interactive)
-  (beautify-json_ "False"))
+;;;###autoload
+(defun json-mode-beautify-ordered (beg end)
+  "Beautify / pretty-print from BEG to END preserving key order."
+  (interactive "r")
+  (json-mode-beautify beg end t))
 
 ;;;###autoload
 (define-derived-mode json-mode javascript-mode "JSON"
@@ -70,7 +89,7 @@
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.json$" . json-mode))
 
-(define-key json-mode-map (kbd "C-c C-f") 'beautify-json)
+(define-key json-mode-map (kbd "C-c C-f") 'json-mode-beautify)
 
 (provide 'json-mode)
 ;;; json-mode.el ends here
