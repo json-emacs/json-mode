@@ -25,10 +25,28 @@
 
 ;;; Code:
 
-(defconst json-mode-quoted-key-re "\\(\"[^\"]+?\"[ ]*:\\)")
-(defconst json-mode-quoted-string-re "\\(\".*?\"\\)")
-(defconst json-mode-number-re "[^\"]\\([0-9]+\\(\\.[0-9]+\\)?\\)[^\"]")
-(defconst json-mode-keyword-re "\\(true\\|false\\|null\\)")
+(require 'js)
+(require 'rx)
+
+(defconst json-mode-quoted-string-re
+  (rx (group (char ?\")
+             (zero-or-more (or (seq ?\\ ?\\)
+                               (seq ?\\ ?\")
+                               (seq ?\\ (not (any ?\" ?\\)))
+                               (not (any ?\" ?\\))))
+             (char ?\"))))
+(defconst json-mode-quoted-key-re
+  (rx (group (char ?\")
+             (zero-or-more (or (seq ?\\ ?\\)
+                               (seq ?\\ ?\")
+                               (seq ?\\ (not (any ?\" ?\\)))
+                               (not (any ?\" ?\\))))
+             (char ?\"))
+      (zero-or-more blank)
+      ?\:))
+(defconst json-mode-number-re (rx (group (one-or-more digit)
+                                         (optional ?\. (one-or-more digit)))))
+(defconst json-mode-keyword-re  (rx (group (or "true" "false" "null"))))
 
 (defconst json-font-lock-keywords-1
   (list
