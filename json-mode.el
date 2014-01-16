@@ -63,11 +63,11 @@
   "python3 -c \"import sys,json,codecs,collections; data=json.loads(sys.stdin.read(),object_pairs_hook=collections.OrderedDict); print((codecs.getdecoder('unicode_escape')(json.dumps(data,sort_keys=%s,indent=4,separators=(',',': '))))[0])\"")
 
 ;;;###autoload
-(defun json-mode-beautify (beg end &optional preserve-key-order)
+(defun json-mode-beautify (&optional preserve-key-order)
   "Beautify / pretty-print from BEG to END, and optionally PRESERVE-KEY-ORDER."
-  (interactive "r\nP")
-  (shell-command-on-region (if mark-active beg (point-min))
-                           (if mark-active end (point-max))
+  (interactive "P")
+  (shell-command-on-region (if (use-region-p) (region-beginning) (point-min))
+                           (if (use-region-p) (region-end) (point-max))
                            (concat (if (executable-find "env") "env " "")
                                    (format (if (executable-find "python2")
                                                json-mode-beautify-command-python2
@@ -76,10 +76,10 @@
                            (current-buffer) t))
 
 ;;;###autoload
-(defun json-mode-beautify-ordered (beg end)
+(defun json-mode-beautify-ordered ()
   "Beautify / pretty-print from BEG to END preserving key order."
-  (interactive "r")
-  (json-mode-beautify beg end t))
+  (interactive)
+  (json-mode-beautify t))
 
 ;;;###autoload
 (define-derived-mode json-mode javascript-mode "JSON"
