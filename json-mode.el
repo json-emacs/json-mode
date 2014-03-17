@@ -1,10 +1,10 @@
 ;;; json-mode.el --- Major mode for editing JSON files
 
-;; Copyright (C) 2011-2013 Josh Johnston
+;; Copyright (C) 2011-2014 Josh Johnston
 
 ;; Author: Josh Johnston
 ;; URL: https://github.com/joshwnj/json-mode
-;; Version: 1.2.0
+;; Version: 1.3.0
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@
 
 (require 'js)
 (require 'rx)
+(require 'json-reformat)
 
 (defconst json-mode-quoted-string-re
   (rx (group (char ?\")
@@ -57,29 +58,13 @@
    )
   "Level one font lock.")
 
-(defconst json-mode-beautify-command-python2
-  "python2 -c \"import sys,json,collections; data=json.loads(sys.stdin.read(),object_pairs_hook=collections.OrderedDict); print json.dumps(data,sort_keys=%s,indent=4,separators=(',',': ')).decode('unicode_escape').encode('utf8','replace')\"")
-(defconst json-mode-beautify-command-python3
-  "python3 -c \"import sys,json,codecs,collections; data=json.loads(sys.stdin.read(),object_pairs_hook=collections.OrderedDict); print((codecs.getdecoder('unicode_escape')(json.dumps(data,sort_keys=%s,indent=4,separators=(',',': '))))[0])\"")
-
 ;;;###autoload
-(defun json-mode-beautify (&optional preserve-key-order)
-  "Beautify / pretty-print from BEG to END, and optionally PRESERVE-KEY-ORDER."
-  (interactive "P")
-  (shell-command-on-region (if (use-region-p) (region-beginning) (point-min))
-                           (if (use-region-p) (region-end) (point-max))
-                           (concat (if (executable-find "env") "env " "")
-                                   (format (if (executable-find "python2")
-                                               json-mode-beautify-command-python2
-                                             json-mode-beautify-command-python3)
-                                           (if preserve-key-order "False" "True")))
-                           (current-buffer) t))
-
-;;;###autoload
-(defun json-mode-beautify-ordered ()
-  "Beautify / pretty-print from BEG to END preserving key order."
+(defun json-mode-beautify ()
+  "Beautify / pretty-print the active region (or the entire buffer if no active region)."
   (interactive)
-  (json-mode-beautify t))
+  (if (use-region-p)
+      (json-reformat-region (region-beginning) (region-end))
+    (json-reformat-region (buffer-end -1) (buffer-end 1))))
 
 ;;;###autoload
 (define-derived-mode json-mode javascript-mode "JSON"
