@@ -4,7 +4,8 @@
 
 ;; Author: Josh Johnston
 ;; URL: https://github.com/joshwnj/json-mode
-;; Version: 1.3.0
+;; Version: 1.3.1
+;; Package-Requires: ((json-reformat "20140301.39"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
