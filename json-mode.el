@@ -60,16 +60,6 @@
   "Level one font lock.")
 
 ;;;###autoload
-(defun json-mode-beautify ()
-  "Beautify / pretty-print the active region (or the entire buffer if no active region)."
-  (interactive)
-  (if (use-region-p)
-      (json-reformat-region (region-beginning) (region-end))
-    (json-reformat-region (buffer-end -1) (buffer-end 1))))
-
-(define-key json-mode-map (kbd "C-c C-f") 'json-mode-beautify)
-
-;;;###autoload
 (define-derived-mode json-mode javascript-mode "JSON"
   "Major mode for editing JSON files"
   (set (make-local-variable 'font-lock-defaults) '(json-font-lock-keywords-1 t)))
@@ -94,6 +84,17 @@
     ))
 
 (define-key json-mode-map (kbd "C-c C-p") 'json-mode-show-path)
+
+;;;###autoload
+(defun json-mode-beautify ()
+  "Beautify / pretty-print the active region (or the entire buffer if no active region)."
+  (interactive)
+  (if (use-region-p)
+      (json-reformat-region (region-beginning) (region-end))
+    (json-reformat-region (buffer-end -1) (buffer-end 1))))
+
+(define-key json-mode-map (kbd "C-c C-f") 'json-mode-beautify)
+
 
 (provide 'json-mode)
 ;;; json-mode.el ends here
