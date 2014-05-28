@@ -12,6 +12,12 @@ Install
 M-x package-install json-mode
 ```
 
+Default Keybindings
+----
+
+- `C-c C-f`: format the region/buffer with `json-reformat` (https://github.com/gongo/json-reformat)
+- `C-c C-p`: display a path to the object at point with `json-snatcher` (https://github.com/Sterlingg/json-snatcher)
+
 License
 ----
 
