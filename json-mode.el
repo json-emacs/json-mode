@@ -4,8 +4,8 @@
 
 ;; Author: Josh Johnston
 ;; URL: https://github.com/joshwnj/json-mode
-;; Version: 1.3.1
-;; Package-Requires: ((json-reformat "20140301.39"))
+;; Version: 1.4.0
+;; Package-Requires: ((json-reformat "20140301.39") (json-snatcher "20131110.1107"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -67,6 +67,8 @@
       (json-reformat-region (region-beginning) (region-end))
     (json-reformat-region (buffer-end -1) (buffer-end 1))))
 
+(define-key json-mode-map (kbd "C-c C-f") 'json-mode-beautify)
+
 ;;;###autoload
 (define-derived-mode json-mode javascript-mode "JSON"
   "Major mode for editing JSON files"
@@ -75,7 +77,23 @@
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.json$" . json-mode))
 
-(define-key json-mode-map (kbd "C-c C-f") 'json-mode-beautify)
+;;;###autoload
+(defun json-mode-show-path ()
+  (interactive)
+  (let ((temp-name "*json-path*"))
+    (with-output-to-temp-buffer temp-name (jsons-print-path))
+
+    (let ((temp-window (get-buffer-window temp-name)))
+      ;; delete the window if we have one,
+      ;; so we can recreate it in the correct position
+      (if temp-window
+          (delete-window temp-window))
+
+      ;; always put the temp window below the json window
+      (set-window-buffer (split-window-below) temp-name))
+    ))
+
+(define-key json-mode-map (kbd "C-c C-p") 'json-mode-show-path)
 
 (provide 'json-mode)
 ;;; json-mode.el ends here
