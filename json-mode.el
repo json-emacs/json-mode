@@ -28,6 +28,7 @@
 
 (require 'js)
 (require 'rx)
+(require 'json-snatcher)
 (require 'json-reformat)
 
 (defconst json-mode-quoted-string-re
