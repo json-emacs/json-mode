@@ -12,6 +12,8 @@ Install
 M-x package-install json-mode
 ```
 
+You need to have the [marmalade repository](https://marmalade-repo.org/) enabled in emacs for this to work.
+
 Default Keybindings
 ----
 
