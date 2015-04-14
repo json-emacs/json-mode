@@ -91,9 +91,10 @@
 (defun json-mode-beautify ()
   "Beautify / pretty-print the active region (or the entire buffer if no active region)."
   (interactive)
-  (if (use-region-p)
-      (json-reformat-region (region-beginning) (region-end))
-    (json-reformat-region (buffer-end -1) (buffer-end 1))))
+  (let ((json-reformat:indent-width js-indent-level))
+    (if (use-region-p)
+        (json-reformat-region (region-beginning) (region-end))
+      (json-reformat-region (buffer-end -1) (buffer-end 1)))))
 
 (define-key json-mode-map (kbd "C-c C-f") 'json-mode-beautify)
 
