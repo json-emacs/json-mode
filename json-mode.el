@@ -5,7 +5,7 @@
 ;; Author: Josh Johnston
 ;; URL: https://github.com/joshwnj/json-mode
 ;; Version: 1.5.0
-;; Package-Requires: ((json-reformat "20141009.1155") (json-snatcher "20131110.1107"))
+;; Package-Requires: ((json-reformat "20141009.1155"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -28,7 +28,6 @@
 
 (require 'js)
 (require 'rx)
-(require 'json-snatcher)
 (require 'json-reformat)
 
 (defconst json-mode-quoted-string-re
@@ -70,24 +69,6 @@
 (add-to-list 'auto-mode-alist '("\\.jsonld$" . json-mode))
 
 ;;;###autoload
-(defun json-mode-show-path ()
-  (interactive)
-  (let ((temp-name "*json-path*"))
-    (with-output-to-temp-buffer temp-name (jsons-print-path))
-
-    (let ((temp-window (get-buffer-window temp-name)))
-      ;; delete the window if we have one,
-      ;; so we can recreate it in the correct position
-      (if temp-window
-          (delete-window temp-window))
-
-      ;; always put the temp window below the json window
-      (set-window-buffer (split-window-below) temp-name))
-    ))
-
-(define-key json-mode-map (kbd "C-c C-p") 'json-mode-show-path)
-
-;;;###autoload
 (defun json-mode-beautify ()
   "Beautify / pretty-print the active region (or the entire buffer if no active region)."
   (interactive)
@@ -97,7 +78,6 @@
       (json-reformat-region (buffer-end -1) (buffer-end 1)))))
 
 (define-key json-mode-map (kbd "C-c C-f") 'json-mode-beautify)
-
 
 (provide 'json-mode)
 ;;; json-mode.el ends here
