@@ -67,6 +67,7 @@
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.json$" . json-mode))
+;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.jsonld$" . json-mode))
 
 ;;;###autoload
