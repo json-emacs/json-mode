@@ -31,6 +31,8 @@
 (require 'json-snatcher)
 (require 'json-reformat)
 
+(defconst js-indent-level 4)
+
 (defconst json-mode-quoted-string-re
   (rx (group (char ?\")
              (zero-or-more (or (seq ?\\ ?\\)

@@ -23,6 +23,9 @@ Default Keybindings
 Indent Width
 ----
 
+By default there are 4 spaces for indents. Change js-indent-level for
+change the behaviour.
+
 See <https://github.com/gongo/json-reformat#configuration> for details on setting the indent width.
 
 License
