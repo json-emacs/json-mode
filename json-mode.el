@@ -91,7 +91,8 @@
 (defun json-mode-beautify ()
   "Beautify / pretty-print the active region (or the entire buffer if no active region)."
   (interactive)
-  (let ((json-reformat:indent-width js-indent-level))
+  (let ((json-reformat:indent-width js-indent-level)
+        (json-reformat:pretty-string? t))
     (if (use-region-p)
         (json-reformat-region (region-beginning) (region-end))
       (json-reformat-region (buffer-end -1) (buffer-end 1)))))
