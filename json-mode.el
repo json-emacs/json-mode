@@ -69,6 +69,12 @@
 (add-to-list 'auto-mode-alist '("\\.json$" . json-mode))
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.jsonld$" . json-mode))
+;;;###autoload
+(add-to-list 'auto-mode-alist (cons (rx (or
+                                         ".babelrc"
+                                         ".bowerrc"
+                                         ) eos)
+                                    'json-mode))
 
 ;;;###autoload
 (defun json-mode-show-path ()
