@@ -35,6 +35,53 @@
   "Major mode for editing JSON files."
   :group 'js)
 
+;;;###autoload
+(defconst json-mode-standard-file-ext '(".json" ".jsonld")
+  "List of JSON file extensions.")
+
+;; This is to be sure the customization is loaded.  Otherwise,
+;; autoload discards any defun or defcustom.
+;;;###autoload
+(defsubst json-mode--update-auto-mode (filenames)
+  "Update the `json-mode' entry of `auto-mode-alist'.
+
+FILENAMES should be a list of file as string.
+Return the new `auto-mode-alist' entry"
+  (let* ((new-regexp
+          (rx-to-string
+           `(seq (eval
+                  (cons 'or
+                        (append json-mode-standard-file-ext
+                                ',filenames))) eot)))
+         (new-entry (cons new-regexp 'json-mode))
+         (old-entry (when (boundp 'json-mode--auto-mode-entry)
+                      json-mode--auto-mode-entry)))
+    (setq auto-mode-alist (delete old-entry auto-mode-alist))
+    (add-to-list 'auto-mode-alist new-entry 'json-mode)
+    new-entry))
+
+;;;###autoload
+(defcustom json-mode-auto-mode-list '(".babelrc" ".bowerrc")
+  "List of filename as string to pass for the JSON entry of
+`auto-mode-alist'.
+
+Note however that custom `json-mode' entries in `auto-mode-alist'
+won’t be affected."
+  :group 'json-mode
+  :type '(repeat string)
+  :set (lambda (symbol value)
+         "Update SYMBOL with a new regexp made from VALUE.
+
+This function calls `json-mode--update-auto-mode' to change the
+`json-mode--auto-mode-entry' entry in `auto-mode-alist'."
+         (set-default symbol value)
+         (setq json-mode--auto-mode-entry (json-mode--update-auto-mode value))))
+
+;; Autoload needed to initalize the the `auto-list-mode' entry.
+;;;###autoload
+(defvar json-mode--auto-mode-entry (json-mode--update-auto-mode json-mode-auto-mode-list)
+  "Regexp generated from the `json-mode-auto-mode-list'.")
+
 (defconst json-mode-quoted-string-re
   (rx (group (char ?\")
              (zero-or-more (or (seq ?\\ ?\\)
@@ -68,17 +115,6 @@
 (define-derived-mode json-mode javascript-mode "JSON"
   "Major mode for editing JSON files"
   (set (make-local-variable 'font-lock-defaults) '(json-font-lock-keywords-1 t)))
-
-;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.json$" . json-mode))
-;;;###autoload
-(add-to-list 'auto-mode-alist '("\\.jsonld$" . json-mode))
-;;;###autoload
-(add-to-list 'auto-mode-alist (cons (rx (or
-                                         ".babelrc"
-                                         ".bowerrc"
-                                         ) eos)
-                                    'json-mode))
 
 ;;;###autoload
 (defun json-mode-show-path ()
