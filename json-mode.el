@@ -1,4 +1,4 @@
-;;; json-mode.el --- Major mode for editing JSON files
+;;; json-mode.el --- Major mode for editing JSON files.
 
 ;; Copyright (C) 2011-2014 Josh Johnston
 
@@ -30,6 +30,10 @@
 (require 'rx)
 (require 'json-snatcher)
 (require 'json-reformat)
+
+(defgroup json-mode '()
+  "Major mode for editing JSON files."
+  :group 'js)
 
 (defconst json-mode-quoted-string-re
   (rx (group (char ?\")
