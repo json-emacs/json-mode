@@ -57,7 +57,7 @@ Return the new `auto-mode-alist' entry"
          (old-entry (when (boundp 'json-mode--auto-mode-entry)
                       json-mode--auto-mode-entry)))
     (setq auto-mode-alist (delete old-entry auto-mode-alist))
-    (add-to-list 'auto-mode-alist new-entry 'json-mode)
+    (add-to-list 'auto-mode-alist new-entry)
     new-entry))
 
 ;;;###autoload
