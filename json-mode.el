@@ -61,7 +61,11 @@ Return the new `auto-mode-alist' entry"
     new-entry))
 
 ;;;###autoload
-(defcustom json-mode-auto-mode-list '(".babelrc" ".bowerrc")
+(defcustom json-mode-auto-mode-list '(
+                                      ".babelrc"
+                                      ".bowerrc"
+                                      "composer.lock"
+                                      )
   "List of filename as string to pass for the JSON entry of
 `auto-mode-alist'.
 
