@@ -144,6 +144,13 @@ This function calls `json-mode--update-auto-mode' to change the
 (define-key json-mode-map (kbd "C-c C-p") 'json-mode-show-path)
 
 ;;;###autoload
+(defun json-mode-kill-path ()
+  (interactive)
+    (kill-new (jsons-print-path)))
+
+(define-key json-mode-map (kbd "C-c P") 'json-mode-kill-path)
+
+;;;###autoload
 (defun json-mode-beautify ()
   "Beautify / pretty-print the active region (or the entire buffer if no active region)."
   (interactive)
