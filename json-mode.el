@@ -125,21 +125,9 @@ This function calls `json-mode--update-auto-mode' to change the
 
 ;;;###autoload
 (defun json-mode-show-path ()
+  "Print the path to the node at point to the minibuffer, and yank to the kill ring."
   (interactive)
-  (let ((temp-name "*json-path*"))
-    (with-output-to-temp-buffer temp-name (jsons-print-path))
-
-    (let ((temp-window (get-buffer-window temp-name)))
-      ;; delete the window if we have one,
-      ;; so we can recreate it in the correct position
-      (if temp-window
-          (delete-window temp-window))
-
-      ;; always put the temp window below the json window
-      (set-window-buffer (if (fboundp 'split-window-below)
-                             (split-window-below)
-                           (split-window-vertically)) temp-name))
-    ))
+  (message (jsons-print-path)))
 
 (define-key json-mode-map (kbd "C-c C-p") 'json-mode-show-path)
 
