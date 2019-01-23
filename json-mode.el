@@ -121,7 +121,8 @@ This function calls `json-mode--update-auto-mode' to change the
   (set (make-local-variable 'font-lock-defaults) '(json-font-lock-keywords-1 t)))
 
 ;; Well formatted JSON files almost always begin with “{” or “[”.
-(add-to-list 'magic-mode-alist '("^[{[]$" . json-mode))
+;;;###autoload
+(add-to-list 'magic-fallback-mode-alist '("^[{[]$" . json-mode))
 
 ;;;###autoload
 (defun json-mode-show-path ()
