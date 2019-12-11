@@ -69,8 +69,7 @@ Return the new `auto-mode-alist' entry"
                                       ".bowerrc"
                                       "composer.lock"
                                       )
-  "List of filename as string to pass for the JSON entry of
-`auto-mode-alist'.
+  "List of filename as string to pass for the JSON entry of `auto-mode-alist'.
 
 Note however that custom `json-mode' entries in `auto-mode-alist'
 won’t be affected."
@@ -108,39 +107,62 @@ This function calls `json-mode--update-auto-mode' to change the
 (defconst json-mode-number-re (rx (group (one-or-more digit)
                                          (optional ?\. (one-or-more digit)))))
 (defconst json-mode-keyword-re  (rx (group (or "true" "false" "null"))))
-(defconst json-mode-line-comments-re
-  (rx (and bol (0+ space) (group (and "//" (*? nonl) eol)))))
-(defconst json-mode-block-comments-re
-  (rx (group (and "/*" (*? anything) "*/"))))
 
 (defconst json-font-lock-keywords-1
   (list
-   (list json-mode-quoted-key-re 1 font-lock-keyword-face)
-   (list json-mode-quoted-string-re 1 font-lock-string-face)
-   (list json-mode-keyword-re 1 font-lock-constant-face)
-   (list json-mode-number-re 1 font-lock-constant-face)
-   )
-  "Level one font lock for `json-mode'.")
-
-(defconst jsonc-font-lock-keywords-1
-  (list
-   (list json-mode-line-comments-re 1 font-lock-comment-face)
-   (list json-mode-block-comments-re 1 font-lock-comment-face)
-   (list json-mode-quoted-key-re 1 font-lock-keyword-face)
-   (list json-mode-quoted-string-re 1 font-lock-string-face)
    (list json-mode-keyword-re 1 font-lock-constant-face)
    (list json-mode-number-re 1 font-lock-constant-face))
-  "Level one font lock for `jsonc-mode'.")
+  "Level one font lock.")
+
+(defvar json-mode-syntax-table
+  (let ((st (make-syntax-table)))
+    ;; Objects
+    (modify-syntax-entry ?\{ "(}" st)
+    (modify-syntax-entry ?\} "){" st)
+    ;; Arrays
+    (modify-syntax-entry ?\[ "(]" st)
+    (modify-syntax-entry ?\] ")[" st)
+    ;; Strings
+    (modify-syntax-entry ?\" "\"" st)
+    st))
+
+(defvar jsonc-mode-syntax-table
+  (let ((st (copy-syntax-table json-mode-syntax-table)))
+    ;; Comments
+    (modify-syntax-entry ?/ ". 124" st)
+    (modify-syntax-entry ?\n ">" st)
+    (modify-syntax-entry ?\^m ">" st)
+    (modify-syntax-entry ?* ". 23bn" st)
+    st))
+
+(defun json-mode--syntactic-face (state)
+  "Return syntactic face function for the position represented by STATE.
+STATE is a `parse-partial-sexp' state, and the returned function is the
+json font lock syntactic face function."
+  (cond
+   ((nth 3 state)
+      ;; This might be a string or a name
+    (let ((startpos (nth 8 state)))
+      (save-excursion
+        (goto-char startpos)
+        (if (looking-at-p json-mode-quoted-key-re)
+            font-lock-keyword-face
+          font-lock-string-face))))
+   ((nth 4 state) font-lock-comment-face)))
 
 ;;;###autoload
 (define-derived-mode json-mode javascript-mode "JSON"
   "Major mode for editing JSON files"
-  (set (make-local-variable 'font-lock-defaults) '(json-font-lock-keywords-1 t)))
+  :syntax-table json-mode-syntax-table
+  (set (make-local-variable 'font-lock-defaults)
+       '(json-font-lock-keywords-1
+         nil nil nil nil
+         (font-lock-syntactic-face-function . json-mode--syntactic-face))))
 
 ;;;###autoload
 (define-derived-mode jsonc-mode json-mode "JSONC"
   "Major mode for editing JSON files with comments"
-  (set (make-local-variable 'font-lock-defaults) '(jsonc-font-lock-keywords-1 t)))
+  :syntax-table jsonc-mode-syntax-table)
 
 ;; Well formatted JSON files almost always begin with “{” or “[”.
 ;;;###autoload
