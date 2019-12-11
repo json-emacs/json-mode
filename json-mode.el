@@ -60,6 +60,9 @@ Return the new `auto-mode-alist' entry"
     (add-to-list 'auto-mode-alist new-entry)
     new-entry))
 
+;;; make byte-compiler happy
+(defvar json-mode--auto-mode-entry)
+
 ;;;###autoload
 (defcustom json-mode-auto-mode-list '(
                                       ".babelrc"
@@ -105,6 +108,10 @@ This function calls `json-mode--update-auto-mode' to change the
 (defconst json-mode-number-re (rx (group (one-or-more digit)
                                          (optional ?\. (one-or-more digit)))))
 (defconst json-mode-keyword-re  (rx (group (or "true" "false" "null"))))
+(defconst json-mode-line-comments-re
+  (rx (and bol (0+ space) (group (and "//" (*? nonl) eol)))))
+(defconst json-mode-block-comments-re
+  (rx (group (and "/*" (*? anything) "*/"))))
 
 (defconst json-font-lock-keywords-1
   (list
@@ -113,12 +120,27 @@ This function calls `json-mode--update-auto-mode' to change the
    (list json-mode-keyword-re 1 font-lock-constant-face)
    (list json-mode-number-re 1 font-lock-constant-face)
    )
-  "Level one font lock.")
+  "Level one font lock for `json-mode'.")
+
+(defconst jsonc-font-lock-keywords-1
+  (list
+   (list json-mode-line-comments-re 1 font-lock-comment-face)
+   (list json-mode-block-comments-re 1 font-lock-comment-face)
+   (list json-mode-quoted-key-re 1 font-lock-keyword-face)
+   (list json-mode-quoted-string-re 1 font-lock-string-face)
+   (list json-mode-keyword-re 1 font-lock-constant-face)
+   (list json-mode-number-re 1 font-lock-constant-face))
+  "Level one font lock for `jsonc-mode'.")
 
 ;;;###autoload
 (define-derived-mode json-mode javascript-mode "JSON"
   "Major mode for editing JSON files"
   (set (make-local-variable 'font-lock-defaults) '(json-font-lock-keywords-1 t)))
+
+;;;###autoload
+(define-derived-mode jsonc-mode json-mode "JSONC"
+  "Major mode for editing JSON files with comments"
+  (set (make-local-variable 'font-lock-defaults) '(jsonc-font-lock-keywords-1 t)))
 
 ;; Well formatted JSON files almost always begin with “{” or “[”.
 ;;;###autoload
