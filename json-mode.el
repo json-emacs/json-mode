@@ -1,4 +1,4 @@
-;;; json-mode.el --- Major mode for editing JSON files.
+;;; json-mode.el --- Major mode for editing JSON files. -*- lexical-binding: t; coding: utf-8 -*-
 
 ;; Copyright (C) 2011-2014 Josh Johnston
 
@@ -35,9 +35,27 @@
   "Major mode for editing JSON files."
   :group 'js)
 
+(defcustom json-mode-timer-enable t
+  "Enables idle validation displayed on mode line."
+  :group 'json-mode
+  :type 'boolean)
+
+(defcustom json-mode-timer-delay 0.1
+  "Delay before idle timer for validation starts."
+  :group 'json-mode
+  :type 'float)
+
+(defvar json-mode-timer nil
+  "Local variable storing a reference to a timer.")
+
+(put 'json-mode-timer 'permanent-local t)
+
 ;;;###autoload
 (defconst json-mode-standard-file-ext '(".json" ".jsonld")
   "List of JSON file extensions.")
+
+(defconst json-mode-mode-name "JSON"
+  "Mode name for `json-mode'.")
 
 ;; This is to be sure the customization is loaded.  Otherwise,
 ;; autoload discards any defun or defcustom.
@@ -118,7 +136,19 @@ This function calls `json-mode--update-auto-mode' to change the
 ;;;###autoload
 (define-derived-mode json-mode javascript-mode "JSON"
   "Major mode for editing JSON files"
-  (set (make-local-variable 'font-lock-defaults) '(json-font-lock-keywords-1 t)))
+  (set (make-local-variable 'font-lock-defaults) '(json-font-lock-keywords-1 t))
+  (when json-mode-timer-enable
+    (make-local-variable 'json-mode-timer)
+    (let ((buffer (current-buffer)))
+      (json-mode-mode-line-validate buffer t)
+      (add-hook 'after-change-functions
+                (lambda (&rest args)
+                  (ignore args)
+                  (json-mode-timer-set buffer))
+                nil t)
+      (cl-flet ((timer-cancel () (json-mode-timer-cancel buffer)))
+        (add-hook 'kill-buffer-hook #'timer-cancel nil t)
+        (add-hook 'change-major-mode-hook #'timer-cancel nil t)))))
 
 ;; Well formatted JSON files almost always begin with “{” or “[”.
 ;;;###autoload
@@ -217,6 +247,59 @@ This function calls `json-mode--update-auto-mode' to change the
   (json-increment-number-at-point -1))
 
 (define-key json-mode-map (kbd "C-c C-d") 'json-decrement-number-at-point)
+
+(defun json-mode-mode-line-validate (buffer &optional force)
+  "Idle timer function to display JSON validity in mode line.
+
+Only BUFFER will be validated when it's active or FORCE is t."
+  (let ((current-buffer-p (eq (current-buffer) buffer)))
+    ;; avoid validating when buffer isn't active
+    (when (or force current-buffer-p)
+      (setq mode-name (format "%s validating…" json-mode-mode-name))
+      (let ((buffer-valid-p (with-current-buffer buffer
+                              (json-mode-buffer-valid-p))))
+        (setq mode-name (format "%s %s"
+                                json-mode-mode-name
+                                (if buffer-valid-p
+                                    "valid"
+                                  "invalid")))))
+    ;; set a timer if buffer wasn't current
+    (when (and (not force) (not current-buffer-p))
+      (add-hook 'buffer-list-update-hook
+                (lambda () (json-mode-timer-set buffer))))))
+
+(defun json-mode-timer-set (target-buffer)
+  "Set up a timer for validation.
+
+TARGET-BUFFER should be the buffer for which the timer should be
+set."
+  (with-current-buffer target-buffer
+    (let ((timer (timer-create)))
+      (timer-set-function timer
+                          #'json-mode-mode-line-validate
+                          (list target-buffer))
+      (timer-set-idle-time timer json-mode-timer-delay)
+      (timer-activate-when-idle timer)
+      (setq json-mode-timer timer))))
+
+(defun json-mode-timer-cancel (buffer)
+  "Cancel a timer in BUFFER."
+  (with-current-buffer buffer
+    (when (local-variable-p 'json-mode-timer)
+      (when json-mode-timer
+        (cancel-timer json-mode-timer))
+      (kill-local-variable 'json-mode-timer))))
+
+(defun json-mode-buffer-valid-p ()
+  "Check if buffer has a valid JSON inside."
+  ;; FIXME: Use `json-reformat' to get the position of the error and display
+  ;; it with overlays, maybe even provide a way to jump to the found error and
+  ;; display the message in the minibuffer.
+  (condition-case nil
+      (progn
+        (json-read-from-string (buffer-string))
+        t)
+    (error nil)))
 
 (provide 'json-mode)
 ;;; json-mode.el ends here
