@@ -30,7 +30,7 @@
 (require 'rx)
 (require 'json-snatcher)
 
-(defgroup json-mode '()
+(defgroup json '()
   "Major mode for editing JSON files."
   :group 'js)
 
@@ -72,7 +72,7 @@ Return the new `auto-mode-alist' entry"
 
 Note however that custom `json-mode' entries in `auto-mode-alist'
 won’t be affected."
-  :group 'json-mode
+  :group 'json
   :type '(repeat string)
   :set (lambda (symbol value)
          "Update SYMBOL with a new regexp made from VALUE.
