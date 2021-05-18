@@ -179,9 +179,9 @@ json font lock syntactic face function."
 (defun json-mode-kill-path ()
   "Save JSON path to object at point to kill ring."
   (interactive)
-    (kill-new (jsons-print-path)))
+  (kill-new (jsons-print-path)))
 
-(define-key json-mode-map (kbd "C-c P") 'json-mode-kill-path)
+(define-key json-mode-map (kbd "C-c C-k") 'json-mode-kill-path)
 
 ;;;###autoload
 (defun json-mode-beautify (begin end)
