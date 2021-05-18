@@ -153,10 +153,10 @@ json font lock syntactic face function."
 (define-derived-mode json-mode javascript-mode "JSON"
   "Major mode for editing JSON files"
   :syntax-table json-mode-syntax-table
-  (set (make-local-variable 'font-lock-defaults)
-       '(json-font-lock-keywords-1
-         nil nil nil nil
-         (font-lock-syntactic-face-function . json-mode--syntactic-face))))
+  (setq font-lock-defaults
+        '(json-font-lock-keywords-1
+          nil nil nil nil
+          (font-lock-syntactic-face-function . json-mode--syntactic-face))))
 
 ;;;###autoload
 (define-derived-mode jsonc-mode json-mode "JSONC"
