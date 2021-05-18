@@ -5,7 +5,7 @@
 ;; Author: Josh Johnston
 ;; URL: https://github.com/joshwnj/json-mode
 ;; Version: 1.6.0
-;; Package-Requires: ((json-reformat "0.0.5") (json-snatcher "1.0.0"))
+;; Package-Requires: ((json-snatcher "1.0.0") (emacs "24.4"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -29,7 +29,6 @@
 (require 'js)
 (require 'rx)
 (require 'json-snatcher)
-(require 'json-reformat)
 
 (defgroup json-mode '()
   "Major mode for editing JSON files."
@@ -140,14 +139,13 @@ This function calls `json-mode--update-auto-mode' to change the
 (define-key json-mode-map (kbd "C-c P") 'json-mode-kill-path)
 
 ;;;###autoload
-(defun json-mode-beautify ()
+(defun json-mode-beautify (begin end)
   "Beautify / pretty-print the active region (or the entire buffer if no active region)."
-  (interactive)
-  (let ((json-reformat:indent-width js-indent-level)
-        (json-reformat:pretty-string? t))
-    (if (use-region-p)
-        (json-reformat-region (region-beginning) (region-end))
-      (json-reformat-region (buffer-end -1) (buffer-end 1)))))
+  (interactive "r")
+  (unless (use-region-p)
+    (setq begin (point-min)
+          end (point-max)))
+  (json-pretty-print begin end))
 
 (define-key json-mode-map (kbd "C-c C-f") 'json-mode-beautify)
 
