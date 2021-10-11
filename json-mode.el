@@ -5,7 +5,7 @@
 ;; Author: Josh Johnston
 ;; URL: https://github.com/joshwnj/json-mode
 ;; Version: 1.6.0
-;; Package-Requires: ((json-reformat "0.0.5") (json-snatcher "1.0.0"))
+;; Package-Requires: ((json-snatcher "1.0.0") (emacs "24.4"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -29,7 +29,6 @@
 (require 'js)
 (require 'rx)
 (require 'json-snatcher)
-(require 'json-reformat)
 
 (defgroup json-mode '()
   "Major mode for editing JSON files."
@@ -60,13 +59,16 @@ Return the new `auto-mode-alist' entry"
     (add-to-list 'auto-mode-alist new-entry)
     new-entry))
 
+;;; make byte-compiler happy
+(defvar json-mode--auto-mode-entry)
+
 ;;;###autoload
 (defcustom json-mode-auto-mode-list '(
                                       ".babelrc"
                                       ".bowerrc"
                                       "composer.lock"
                                       )
-  "List of filenames as for the JSON entry of `auto-mode-alist'.
+  "List of filenames for the JSON entry of `auto-mode-alist'.
 
 Note however that custom `json-mode' entries in `auto-mode-alist'
 won’t be affected."
@@ -107,17 +109,59 @@ This function calls `json-mode--update-auto-mode' to change the
 
 (defconst json-font-lock-keywords-1
   (list
-   (list json-mode-quoted-key-re 1 font-lock-keyword-face)
-   (list json-mode-quoted-string-re 1 font-lock-string-face)
    (list json-mode-keyword-re 1 font-lock-constant-face)
-   (list json-mode-number-re 1 font-lock-constant-face)
-   )
+   (list json-mode-number-re 1 font-lock-constant-face))
   "Level one font lock.")
+
+(defvar json-mode-syntax-table
+  (let ((st (make-syntax-table)))
+    ;; Objects
+    (modify-syntax-entry ?\{ "(}" st)
+    (modify-syntax-entry ?\} "){" st)
+    ;; Arrays
+    (modify-syntax-entry ?\[ "(]" st)
+    (modify-syntax-entry ?\] ")[" st)
+    ;; Strings
+    (modify-syntax-entry ?\" "\"" st)
+    st))
+
+(defvar jsonc-mode-syntax-table
+  (let ((st (copy-syntax-table json-mode-syntax-table)))
+    ;; Comments
+    (modify-syntax-entry ?/ ". 124" st)
+    (modify-syntax-entry ?\n ">" st)
+    (modify-syntax-entry ?\^m ">" st)
+    (modify-syntax-entry ?* ". 23bn" st)
+    st))
+
+(defun json-mode--syntactic-face (state)
+  "Return syntactic face function for the position represented by STATE.
+STATE is a `parse-partial-sexp' state, and the returned function is the
+json font lock syntactic face function."
+  (cond
+   ((nth 3 state)
+      ;; This might be a string or a name
+    (let ((startpos (nth 8 state)))
+      (save-excursion
+        (goto-char startpos)
+        (if (looking-at-p json-mode-quoted-key-re)
+            font-lock-keyword-face
+          font-lock-string-face))))
+   ((nth 4 state) font-lock-comment-face)))
 
 ;;;###autoload
 (define-derived-mode json-mode javascript-mode "JSON"
   "Major mode for editing JSON files"
-  (set (make-local-variable 'font-lock-defaults) '(json-font-lock-keywords-1 t)))
+  :syntax-table json-mode-syntax-table
+  (set (make-local-variable 'font-lock-defaults)
+       '(json-font-lock-keywords-1
+         nil nil nil nil
+         (font-lock-syntactic-face-function . json-mode--syntactic-face))))
+
+;;;###autoload
+(define-derived-mode jsonc-mode json-mode "JSONC"
+  "Major mode for editing JSON files with comments"
+  :syntax-table jsonc-mode-syntax-table)
 
 ;; Well formatted JSON files almost always begin with “{” or “[”.
 ;;;###autoload
@@ -140,14 +184,13 @@ This function calls `json-mode--update-auto-mode' to change the
 (define-key json-mode-map (kbd "C-c P") 'json-mode-kill-path)
 
 ;;;###autoload
-(defun json-mode-beautify ()
+(defun json-mode-beautify (begin end)
   "Beautify / pretty-print the active region (or the entire buffer if no active region)."
-  (interactive)
-  (let ((json-reformat:indent-width js-indent-level)
-        (json-reformat:pretty-string? t))
-    (if (use-region-p)
-        (json-reformat-region (region-beginning) (region-end))
-      (json-reformat-region (buffer-end -1) (buffer-end 1)))))
+  (interactive "r")
+  (unless (use-region-p)
+    (setq begin (point-min)
+          end (point-max)))
+  (json-pretty-print begin end))
 
 (define-key json-mode-map (kbd "C-c C-f") 'json-mode-beautify)
 
