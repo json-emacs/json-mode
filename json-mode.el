@@ -68,7 +68,7 @@ Return the new `auto-mode-alist' entry"
                                       ".bowerrc"
                                       "composer.lock"
                                       )
-  "List of filename as string to pass for the JSON entry of `auto-mode-alist'.
+  "List of filenames for the JSON entry of `auto-mode-alist'.
 
 Note however that custom `json-mode' entries in `auto-mode-alist'
 won’t be affected."
@@ -169,7 +169,7 @@ json font lock syntactic face function."
 
 ;;;###autoload
 (defun json-mode-show-path ()
-  "Print the path to the node at point to the minibuffer, and yank to the kill ring."
+  "Print the path to the node at point to the minibuffer."
   (interactive)
   (message (jsons-print-path)))
 
@@ -177,6 +177,7 @@ json font lock syntactic face function."
 
 ;;;###autoload
 (defun json-mode-kill-path ()
+  "Save JSON path to object at point to kill ring."
   (interactive)
     (kill-new (jsons-print-path)))
 
