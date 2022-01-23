@@ -123,6 +123,8 @@ This function calls `json-mode--update-auto-mode' to change the
     (modify-syntax-entry ?\] ")[" st)
     ;; Strings
     (modify-syntax-entry ?\" "\"" st)
+    ;; Comments
+    (modify-syntax-entry ?\n ">" st)
     st))
 
 (defvar jsonc-mode-syntax-table
