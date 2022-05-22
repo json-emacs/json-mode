@@ -149,7 +149,7 @@ json font lock syntactic face function."
 
 ;;;###autoload
 (define-derived-mode json-mode javascript-mode "JSON"
-  "Major mode for editing JSON files"
+  "Major mode for editing JSON files."
   :syntax-table json-mode-syntax-table
   (setq font-lock-defaults
         '(json-font-lock-keywords-1
@@ -158,7 +158,7 @@ json font lock syntactic face function."
 
 ;;;###autoload
 (define-derived-mode jsonc-mode json-mode "JSONC"
-  "Major mode for editing JSON files with comments"
+  "Major mode for editing JSON files with comments."
   :syntax-table jsonc-mode-syntax-table)
   (setq font-lock-defaults '(json-font-lock-keywords-1 t))
 
@@ -184,7 +184,7 @@ json font lock syntactic face function."
 
 ;;;###autoload
 (defun json-mode-beautify (begin end)
-  "Beautify / pretty-print the active region (or the entire buffer if no active region)."
+  "Beautify/pretty-print from BEGIN to END (or the entire buffer if no active region)."
   (interactive "r")
   (unless (use-region-p)
     (setq begin (point-min)
