@@ -1,4 +1,4 @@
-;;; json-mode.el --- Major mode for editing JSON files.
+;;; json-mode.el --- Major mode for editing JSON files
 
 ;; Copyright (C) 2011-2014 Josh Johnston
 
@@ -63,11 +63,9 @@ Return the new `auto-mode-alist' entry"
 (defvar json-mode--auto-mode-entry)
 
 ;;;###autoload
-(defcustom json-mode-auto-mode-list '(
-                                      ".babelrc"
+(defcustom json-mode-auto-mode-list '(".babelrc"
                                       ".bowerrc"
-                                      "composer.lock"
-                                      )
+                                      "composer.lock")
   "List of filenames for the JSON entry of `auto-mode-alist'.
 
 Note however that custom `json-mode' entries in `auto-mode-alist'
@@ -162,6 +160,7 @@ json font lock syntactic face function."
 (define-derived-mode jsonc-mode json-mode "JSONC"
   "Major mode for editing JSON files with comments"
   :syntax-table jsonc-mode-syntax-table)
+  (setq font-lock-defaults '(json-font-lock-keywords-1 t))
 
 ;; Well formatted JSON files almost always begin with “{” or “[”.
 ;;;###autoload
