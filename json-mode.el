@@ -257,7 +257,7 @@ json font lock syntactic face function."
 (define-key json-mode-map (kbd "C-c C-i") 'json-increment-number-at-point)
 
 (defun json-decrement-number-at-point (&optional delta)
-  "Decrement the number at point."
+  "Subtract DELTA from the number at point; DELTA defaults to 1."
   (interactive "P")
   (json-increment-number-at-point (- (or delta 1))))
 
