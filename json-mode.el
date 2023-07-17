@@ -1,4 +1,4 @@
-;;; json-mode.el --- Major mode for editing JSON files.
+;;; json-mode.el --- Major mode for editing JSON files
 
 ;; Copyright (C) 2011-2014 Josh Johnston
 
@@ -30,7 +30,7 @@
 (require 'rx)
 (require 'json-snatcher)
 
-(defgroup json-mode '()
+(defgroup json '()
   "Major mode for editing JSON files."
   :group 'js)
 
@@ -63,16 +63,14 @@ Return the new `auto-mode-alist' entry"
 (defvar json-mode--auto-mode-entry)
 
 ;;;###autoload
-(defcustom json-mode-auto-mode-list '(
-                                      ".babelrc"
+(defcustom json-mode-auto-mode-list '(".babelrc"
                                       ".bowerrc"
-                                      "composer.lock"
-                                      )
+                                      "composer.lock")
   "List of filenames for the JSON entry of `auto-mode-alist'.
 
 Note however that custom `json-mode' entries in `auto-mode-alist'
 won’t be affected."
-  :group 'json-mode
+  :group 'json
   :type '(repeat string)
   :set (lambda (symbol value)
          "Update SYMBOL with a new regexp made from VALUE.
@@ -153,17 +151,18 @@ json font lock syntactic face function."
 
 ;;;###autoload
 (define-derived-mode json-mode javascript-mode "JSON"
-  "Major mode for editing JSON files"
+  "Major mode for editing JSON files."
   :syntax-table json-mode-syntax-table
-  (set (make-local-variable 'font-lock-defaults)
-       '(json-font-lock-keywords-1
-         nil nil nil nil
-         (font-lock-syntactic-face-function . json-mode--syntactic-face))))
+  (setq font-lock-defaults
+        '(json-font-lock-keywords-1
+          nil nil nil nil
+          (font-lock-syntactic-face-function . json-mode--syntactic-face))))
 
 ;;;###autoload
 (define-derived-mode jsonc-mode json-mode "JSONC"
-  "Major mode for editing JSON files with comments"
+  "Major mode for editing JSON files with comments."
   :syntax-table jsonc-mode-syntax-table)
+  (setq font-lock-defaults '(json-font-lock-keywords-1 t))
 
 ;; Well formatted JSON files almost always begin with “{” or “[”.
 ;;;###autoload
@@ -181,13 +180,13 @@ json font lock syntactic face function."
 (defun json-mode-kill-path ()
   "Save JSON path to object at point to kill ring."
   (interactive)
-    (kill-new (jsons-print-path)))
+  (kill-new (jsons-print-path)))
 
-(define-key json-mode-map (kbd "C-c P") 'json-mode-kill-path)
+(define-key json-mode-map (kbd "C-c C-k") 'json-mode-kill-path)
 
 ;;;###autoload
 (defun json-mode-beautify (begin end)
-  "Beautify / pretty-print the active region (or the entire buffer if no active region)."
+  "Beautify/pretty-print from BEGIN to END (or the entire buffer if no active region)."
   (interactive "r")
   (unless (use-region-p)
     (setq begin (point-min)
