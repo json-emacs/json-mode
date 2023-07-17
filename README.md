@@ -29,7 +29,7 @@ Default Keybindings
 Indent Width
 ----
 
-See <https://github.com/gongo/json-reformat#configuration> for details on setting the indent width.
+Customize `js-indent-level`.
 
 License
 ----
