@@ -101,7 +101,8 @@ This function calls `json-mode--update-auto-mode' to change the
              (char ?\"))
       (zero-or-more blank)
       ?\:))
-(defconst json-mode-number-re (rx (group (one-or-more digit)
+(defconst json-mode-number-re (rx (group (optional ?-)
+                                         (one-or-more digit)
                                          (optional ?\. (one-or-more digit)))))
 (defconst json-mode-keyword-re  (rx (group (or "true" "false" "null"))))
 
@@ -230,7 +231,7 @@ json font lock syntactic face function."
      ((setq symbol (bounds-of-thing-at-point 'symbol))
       (cond
        ((looking-at-p "null"))
-       ((save-excursion (skip-chars-backward "[0-9.]") (looking-at json-mode-number-re))
+       ((save-excursion (skip-chars-backward "[-0-9.]") (looking-at json-mode-number-re))
         (kill-region (match-beginning 0) (match-end 0))
         (insert "null"))
        (t (kill-region (car symbol) (cdr symbol)) (insert "null"))))
@@ -244,8 +245,8 @@ json font lock syntactic face function."
 
 (defun json-increment-number-at-point (&optional delta)
   "Add DELTA to the number at point; DELTA defaults to 1."
-  (interactive)
-  (when (save-excursion (skip-chars-backward "[0-9.]") (looking-at json-mode-number-re))
+  (interactive "P")
+  (when (save-excursion (skip-chars-backward "[-0-9.]") (looking-at json-mode-number-re))
     (let ((num (+ (or delta 1)
                   (string-to-number (buffer-substring-no-properties (match-beginning 0) (match-end 0)))))
           (pt (point)))
@@ -255,10 +256,10 @@ json font lock syntactic face function."
 
 (define-key json-mode-map (kbd "C-c C-i") 'json-increment-number-at-point)
 
-(defun json-decrement-number-at-point ()
+(defun json-decrement-number-at-point (&optional delta)
   "Decrement the number at point."
-  (interactive)
-  (json-increment-number-at-point -1))
+  (interactive "P")
+  (json-increment-number-at-point (- (or delta 1))))
 
 (define-key json-mode-map (kbd "C-c C-d") 'json-decrement-number-at-point)
 
