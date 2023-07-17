@@ -18,7 +18,7 @@ You need to have the [MELPA repository](https://melpa.org/) or [MELPA Stable rep
 Default Keybindings
 ----
 
-- `C-c C-f`: format the region/buffer with `json-reformat` (<https://github.com/gongo/json-reformat>)
+- `C-c C-f`: format the region/buffer with `json-pretty-print` (<https://git.savannah.gnu.org/cgit/emacs.git/tree/lisp/json.el>)
 - `C-c C-p`: display a path to the object at point with `json-snatcher` (<https://github.com/Sterlingg/json-snatcher>)
 - `C-c P`: copy a path to the object at point to the kill ring with `json-snatcher` (<https://github.com/Sterlingg/json-snatcher>)
 - `C-c C-t`: Toggle between `true` and `false` at point
