@@ -187,7 +187,9 @@ json font lock syntactic face function."
 
 ;;;###autoload
 (defun json-mode-beautify (begin end)
-  "Beautify/pretty-print from BEGIN to END (or the entire buffer if no active region)."
+  "Beautify/pretty-print from BEGIN to END.
+
+If the region is not active, beautify the entire buffer ."
   (interactive "r")
   (unless (use-region-p)
     (setq begin (point-min)
