@@ -124,7 +124,15 @@ This function calls `json-mode--update-auto-mode' to change the
     (modify-syntax-entry ?\" "\"" st)
     ;; Comments
     (modify-syntax-entry ?\n ">" st)
+    ;; Dot in floating point number literal.
+    (modify-syntax-entry ?. "_" st)
     st))
+
+(defvar json-mode--string-syntax-table
+  (let ((st (copy-syntax-table json-mode-syntax-table)))
+    (modify-syntax-entry ?. "." st)
+    st)
+  "Syntax table for strings.")
 
 (defvar jsonc-mode-syntax-table
   (let ((st (copy-syntax-table json-mode-syntax-table)))
@@ -135,13 +143,19 @@ This function calls `json-mode--update-auto-mode' to change the
     (modify-syntax-entry ?* ". 23bn" st)
     st))
 
+(defvar jsonc-mode--string-syntax-table
+  (let ((st (copy-syntax-table jsonc-mode-syntax-table)))
+    (modify-syntax-entry ?. "." st)
+    st)
+  "Syntax table for strings and comments.")
+
 (defun json-mode--syntactic-face (state)
   "Return syntactic face function for the position represented by STATE.
 STATE is a `parse-partial-sexp' state, and the returned function is the
 json font lock syntactic face function."
   (cond
    ((nth 3 state)
-      ;; This might be a string or a name
+    ;; This might be a string or a name
     (let ((startpos (nth 8 state)))
       (save-excursion
         (goto-char startpos)
@@ -150,6 +164,29 @@ json font lock syntactic face function."
           font-lock-string-face))))
    ((nth 4 state) font-lock-comment-face)))
 
+(defun json-mode-forward-sexp (&optional arg)
+  "Move point forward an atom or balanced bracket.
+
+See `forward-sexp for ARG."
+  (interactive "p")
+  (unless arg
+    (setq arg 1))
+  (let ((forward-sexp-function nil)
+        (sign (if (< arg 0) -1 1))
+        state)
+    (while (not (zerop arg))
+      (setq state (syntax-ppss))
+      (if (nth 8 state)
+          ;; Inside a string or comment.
+          (progn
+            (with-syntax-table
+                (if (eq major-mode 'jsonc-mode)
+                    jsonc-mode--string-syntax-table
+                  json-mode--string-syntax-table)
+              (forward-sexp sign)))
+        (forward-sexp sign))
+      (setq arg (- arg sign)))))
+
 ;;;###autoload
 (define-derived-mode json-mode javascript-mode "JSON"
   "Major mode for editing JSON files."
@@ -157,7 +194,8 @@ json font lock syntactic face function."
   (setq font-lock-defaults
         '(json-font-lock-keywords-1
           nil nil nil nil
-          (font-lock-syntactic-face-function . json-mode--syntactic-face))))
+          (font-lock-syntactic-face-function . json-mode--syntactic-face)))
+  (setq-local forward-sexp-function #'json-mode-forward-sexp))
 
 ;;;###autoload
 (define-derived-mode jsonc-mode json-mode "JSONC"
