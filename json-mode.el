@@ -1,10 +1,11 @@
 ;;; json-mode.el --- Major mode for editing JSON files
 
-;; Copyright (C) 2011-2014 Josh Johnston
+;; Copyright (C) 2011-2023 Josh Johnston, taku0
 
 ;; Author: Josh Johnston
+;;         taku0
 ;; URL: https://github.com/joshwnj/json-mode
-;; Version: 1.6.0
+;; Version: 1.9.0
 ;; Package-Requires: ((json-snatcher "1.0.0") (emacs "24.4"))
 
 ;; This program is free software; you can redistribute it and/or modify
