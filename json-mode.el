@@ -1,4 +1,4 @@
-;;; json-mode.el --- Major mode for editing JSON files
+;;; json-mode.el --- Major mode for editing JSON files -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2011-2023 Josh Johnston, taku0
 
