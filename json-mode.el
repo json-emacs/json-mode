@@ -272,7 +272,7 @@ If the region is not active, beautify the entire buffer ."
      ((setq symbol (bounds-of-thing-at-point 'symbol))
       (cond
        ((looking-at-p "null"))
-       ((save-excursion (skip-chars-backward "[-0-9.]") (looking-at json-mode-number-re))
+       ((save-excursion (skip-chars-backward "-0-9.") (looking-at json-mode-number-re))
         (kill-region (match-beginning 0) (match-end 0))
         (insert "null"))
        (t (kill-region (car symbol) (cdr symbol)) (insert "null"))))
@@ -287,7 +287,7 @@ If the region is not active, beautify the entire buffer ."
 (defun json-increment-number-at-point (&optional delta)
   "Add DELTA to the number at point; DELTA defaults to 1."
   (interactive "P")
-  (when (save-excursion (skip-chars-backward "[-0-9.]") (looking-at json-mode-number-re))
+  (when (save-excursion (skip-chars-backward "-0-9.") (looking-at json-mode-number-re))
     (let ((num (+ (or delta 1)
                   (string-to-number (buffer-substring-no-properties (match-beginning 0) (match-end 0)))))
           (pt (point)))
