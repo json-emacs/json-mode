@@ -201,8 +201,7 @@ See `forward-sexp for ARG."
 ;;;###autoload
 (define-derived-mode jsonc-mode json-mode "JSONC"
   "Major mode for editing JSON files with comments."
-  :syntax-table jsonc-mode-syntax-table
-  (setq font-lock-defaults '(json-font-lock-keywords-1 t)))
+  :syntax-table jsonc-mode-syntax-table)
 
 ;; Well formatted JSON files almost always begin with “{” or “[”.
 ;;;###autoload
