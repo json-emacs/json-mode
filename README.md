@@ -4,7 +4,7 @@ json-mode.el
 Major mode for editing JSON files.
 
 Extends the builtin js-mode to add better syntax highlighting for JSON
-and some nice editing keybindings.
+and some nice editing keybindings. 
 
 Install
 ----
@@ -30,6 +30,11 @@ Indent Width
 ----
 
 Customize `js-indent-level`.
+
+JSON With Comments
+---
+
+In addition to JSON files, this package provides `jsonc-mode` for editing JSON with commas and comments (sometimes referred to as huJSON or JWCC).
 
 License
 ----
