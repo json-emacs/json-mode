@@ -4,7 +4,7 @@ json-mode.el
 Major mode for editing JSON files.
 
 Extends the builtin js-mode to add better syntax highlighting for JSON
-and some nice editing keybindings. 
+and some nice editing keybindings.
 
 Install
 ----
